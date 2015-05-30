@@ -17,10 +17,11 @@
  */
 
 
-/* Measures temperature with the Dallas DS18B20, using code from
- * https://github.com/milesburton/Arduino-Temperature-Control-Library
+/* Measures temperature with the Dallas DS18B20 temperature sensor.
+ * Make sure you have both the MAX31850 OneWire and the MAX31850 DallasTemp
+ * libraries installed.
  *
- * For instructions how to connect the sensor to Arduino,
+ * For instructions how to connect the temperature sensor to Arduino,
  * see http://bildr.org/2011/07/ds18b20-arduino/
  *
  * Writes temperature onto serial, and possibly a serial 7 segment display.
