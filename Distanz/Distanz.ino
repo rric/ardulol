@@ -16,10 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-int PotPin = A0;
+/* Liest analoge Werte eines Sharp GP2Y0A21YK IR Distanzsensors ein und
+ * gibt diese auf einem LED-Balken aus -- je näher, desto mehr LEDs leuchten.
+ */
+
+int SensorPin = A0;
 
 void setup()
 {
+    Serial.begin(9600);
+    
     // Pins 3 bis 12 sind OUTPUT
     for (int pos = 3; pos <= 12; ++pos) {
         pinMode(pos, OUTPUT);
@@ -31,17 +37,29 @@ void loop()
 {
     // Lies analogen Wert im Bereich [0, 1023] ein, verwandle diesen
     // in einen Wert im Bereich [0, 10], ...
-    int value = analogRead(PotPin);
-    int show = map(value, 0, 1023, 0, 10);
+    int value = analogRead(SensorPin);
+    int out = map(value, 0, 1024, 0, 10);  // Zeile 37
+    int show = constrain(out, 0, 10);
 
     // ... und schalte entsprechend viele LEDs ein
     for (int pos = 0; pos < 10; ++pos) {
         digitalWrite(3 + pos, pos < show ? HIGH : LOW);
     }
+    
+    // Gib Werte über serielle Schnittstelle aus
+    Serial.print(value); 
+    Serial.print(" "); 
+    Serial.println(show);
+    
+    delay(100);
 }
 
 
 /* IDEEN:
-    1. Ändere die Anzeige so, dass immer nur eine LED aufleuchtet und je nach
-    analogem Wert hin- und herwandert.
+    1. Passe die Werte in Zeile 37 so an, dass bei kleiner Distanz alle
+        10 LEDs leuchten.
+    
+    2*. Bestimme eine Funktion, die die analogen Werte im Bereich [0, 1023] 
+        in einen Wert in Zentimetern im Bereich [0 cm, 100 cm] umrechnet 
+        Hinweis: http://www.sparkfun.com/datasheets/Components/GP2Y0A21YK.pdf
 */

@@ -32,11 +32,10 @@ void setup()
 
 void loop()
 {
-    // Lies analogen Wert im Bereich [0,1023] ein, verwandle diesen in einen
-    // Wert im Bereich [0,255], und gib diesen Wert aus.
+    // Lies analogen Wert im Bereich [0, 1023] ein, verwandle diesen
+    //  in einen Wert im Bereich [0, 255], und gib diesen Wert aus.
     int value = analogRead(QRDPin);
-    int out = map(value, 0, 1024, 0, 255);
-    int pwm = constrain(out, 0, 255);
+    int pwm = map(value, 0, 1024, 0, 255);
 
     analogWrite(LEDPin, pwm);
 
