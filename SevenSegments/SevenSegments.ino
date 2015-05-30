@@ -74,7 +74,7 @@ int tick = 0;
 
 void loop()
 {
-    const int NTicks = 100;
+    const int NTicks = 60;
 
     char str[5];
     snprintf(str, 5, "t=%2d", tick);
@@ -87,7 +87,7 @@ void loop()
 }
 
 
-// Turn on on of the four digits 1, 2, 3, or 4
+// Turn on or of the four digits 1, 2, 3, or 4
 void turnOnDigit(int digit)
 {
     byte bits = 0;
@@ -129,7 +129,7 @@ void displayString(const char* ch)
 }
 
 
-// Marvel how many characters can be used with this simple display; see also
+// Marvel at how many characters can be used with this simple display; see also
 // http://en.wikipedia.org/wiki/Seven-segment_display_character_representations
 void displayChar(char c)
 {
