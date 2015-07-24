@@ -29,25 +29,28 @@
  * The following pin mapping is assumed:
  *
  * Arduino Pin   ...   YSD-439AB4B-35 Pin
- *          2           14 (A)
- *          3           16 (B)
- *          4           13 (C)
- *          5            3 (D)
- *          6            5 (E)
- *          7           11 (F)
- *          8           15 (G)
- *          9            1 (DIG1)
- *         10            2 (DIG2)
- *         11            6 (DIG3)
- *         12            8 (DIG4)
- *         A0            7 (Comma)
- *         A1            4 (Colon)
+ *          5           14 (A)
+ *          6           16 (B)
+ *          7           13 (C)
+ *          8            3 (D)
+ *          9            5 (E)
+ *         10           11 (F)
+ *         11           15 (G)
+ *         12            7 (Comma)
+ *         13            4 (Colon)
+ *         A0            1 (DIG1)
+ *         A1            2 (DIG2)
+ *         A2            6 (DIG3)
+ *         A3            8 (DIG4)
  *
- * Arduino pins 9, 10, 11, and 12 are connected to DIG1, DIG2, DIG3, and DIG4
- * via a 1 kOhm resistor, each (which means "common anode" logic: setting the
- * Arduino pin HIGH turns the correspondig digit OFF, and vice versa).
- * The display's pin 12 is connected to ground via another 1 kOhm resistor;
- * so, setting Arduino pin A1 to HIGH turns the colon ON, and vice versa.
+ * Arduino pins A0, A1, A2 and A3 are each connected to DIG1, DIG2, DIG3, 
+ * and DIG4 via a 1 kOhm resistor, which means "common anode" logic: 
+ * setting the Arduino pin HIGH turns the digit OFF, and vice versa.
+ * 
+ * The only "common cathode" logic digit is the colon: Arduino pin 13 is
+ * connected to segment pin 4, and segment pin 12 is connected to ground
+ * via a 1 kOhm resistor.
+ * So, setting Arduino pin 13 to HIGH turns the colon ON, and vice versa.
  *
  * For further instructions how to connect and drive the module, see e.g.
  * http://allaboutee.com/2011/07/09/arduino-4-digit-7-segment-display-tutorial/
@@ -58,26 +61,44 @@
 #include <Metro.h>
 
 
+Metro metro = Metro(1000);
+int tick = 0;
+
+
 void setup()
 {
-    for (int port = 2; port <= 12; ++port) {
+    for (int port = 5; port <= 13; ++port) {
         pinMode(port, OUTPUT);
     }
 
     pinMode(A0, OUTPUT);
     pinMode(A1, OUTPUT);
+    pinMode(A2, OUTPUT);
+    pinMode(A3, OUTPUT);
+
+    while (!metro.check()) {
+        displayString("Ardu");
+    }
+
+    while (!metro.check()) { 
+        displayString(" ino");
+    }
+
+    metro.interval(100);
 }
 
-
-Metro metro = Metro(1000);
-int tick = 0;
 
 void loop()
 {
     const int NTicks = 60;
 
-    char str[5];
-    snprintf(str, 5, "t=%2d", tick);
+    // For some reasons, Arduino's sprintf() implementation does not support %f, 
+    // so do a workaround here. See also http://stackoverflow.com/q/27651012
+    char str[6];
+    snprintf(str, 6, "t=%02d", tick);
+    str[4] = str[3];
+    str[3] = '.';
+    str[5] = 0;
 
     displayString(str);
 
@@ -91,10 +112,11 @@ void loop()
 void turnOnDigit(int digit)
 {
     byte bits = 0;
-    bitSet(bits, digit);
+    bitSet(bits, digit-1);
 
-    PORTB &= bits | B11100001;
-    PORTB |= bits;
+    // Zero out pins A0 to A3, then set the one which was set in bits
+    PORTC &= bits | B11110000;
+    PORTC |= bits;
 }
 
 
@@ -107,19 +129,21 @@ void displayString(const char* ch)
         displayChar(ch[i]);
 
         // Set comma or colon, if placed correctly
-        byte bits = B00000001;
+        boolean showComma = false;
+        boolean showColon = false;
 
         if (i == 1 && ch[i + 1] == ':') {
-            bitSet(bits, 1);
+            showColon = true;
             ++i;
         }
         else if (ch[i + 1] == '.' || ch[i + 1] == ',') {
-            bitClear(bits, 0);
+            showComma = true;
             ++i;
         }
-
-        PORTC &= bits | B11111100;
-        PORTC |= bits;
+        // Comma follows "common anode" logic, 
+        // whereas colon follows "common cathode" logic
+        digitalWrite(12, showComma ? LOW : HIGH);
+        digitalWrite(13, showColon ? HIGH : LOW);
 
         // Turn on the current digit
         turnOnDigit(j);
@@ -129,12 +153,13 @@ void displayString(const char* ch)
 }
 
 
-// Marvel at how many characters can be used with this simple display; see also
+// Many characters can be used with this simple display; see also
 // http://en.wikipedia.org/wiki/Seven-segment_display_character_representations
 void displayChar(char c)
 {
     byte bits;
 
+    // Set the seven bits for segements A to G, in G-F-E-D-C-B-A order
     switch (c) {
         case '-': bits = B01000000; break;
         case '0':
@@ -184,9 +209,9 @@ void displayChar(char c)
     // "Common anode" means 1 turns off, and 0 turns on; so negate bits first
     byte negBits = ~bits;
 
-    PORTD &= (negBits << 2) | B00000011;
-    PORTD |= (negBits << 2);
+    PORTD &= (negBits << 5) | B0001111;
+    PORTD |= (negBits << 5);
 
-    PORTB &= (negBits >> 6) | B11111110;
-    PORTB |= (negBits >> 6);
+    PORTB &= (negBits >> 3) | B11110000;
+    PORTB |= (negBits >> 3);
 }
