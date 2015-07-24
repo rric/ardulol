@@ -38,13 +38,13 @@
  *         11           15 (G)
  *         12            7 (Comma)
  *         13            4 (Colon)
- *         A0            1 (DIG1)
- *         A1            2 (DIG2)
- *         A2            6 (DIG3)
- *         A3            8 (DIG4)
+ *         A0            8 (DIG4)
+ *         A1            6 (DIG3)
+ *         A2            2 (DIG2)
+ *         A3            1 (DIG1)
  *
- * Arduino pins A0, A1, A2 and A3 are each connected to DIG1, DIG2, DIG3, 
- * and DIG4 via a 1 kOhm resistor, which means "common anode" logic: 
+ * Arduino pins A0, A1, A2 and A3 are each connected to DIG4, DIG3, DIG2, 
+ * and DIG1 via a 1 kOhm resistor, which means "common anode" logic: 
  * setting the Arduino pin HIGH turns the digit OFF, and vice versa.
  * 
  * The only "common cathode" logic digit is the colon: Arduino pin 13 is
@@ -90,7 +90,7 @@ void setup()
 
 void loop()
 {
-    const int NTicks = 60;
+    const int NTicks = 99;
 
     // For some reasons, Arduino's sprintf() implementation does not support %f, 
     // so do a workaround here. See also http://stackoverflow.com/q/27651012
@@ -112,7 +112,7 @@ void loop()
 void turnOnDigit(int digit)
 {
     byte bits = 0;
-    bitSet(bits, digit-1);
+    bitSet(bits, 4-digit);
 
     // Zero out pins A0 to A3, then set the one which was set in bits
     PORTC &= bits | B11110000;
