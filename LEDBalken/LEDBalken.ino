@@ -21,8 +21,8 @@ int PotPin = A0;
 void setup()
 {
     // Pins 3 bis 12 sind OUTPUT
-    for (int pos = 3; pos <= 12; ++pos) {
-        pinMode(pos, OUTPUT);
+    for (int pos = 0; pos < 10; ++pos) {
+        pinMode(3 + pos, OUTPUT);
     }
 }
 
