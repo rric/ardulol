@@ -1,6 +1,6 @@
 /* SevenSegments.ino
  *
- * Copyright 2015 Roland Richter
+ * Copyright 2015, 2016 Roland Richter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,11 +57,9 @@
  */
 
 #include <stdio.h>
+#include <RBD_Timer.h>
 
-#include <Metro.h>
-
-
-Metro metro = Metro(1000);
+RBD::Timer timer;
 int tick = 0;
 
 
@@ -76,15 +74,20 @@ void setup()
     pinMode(A2, OUTPUT);
     pinMode(A3, OUTPUT);
 
-    while (!metro.check()) {
+    timer.setTimeout(1000);
+    timer.restart();
+
+    while (timer.isActive()) {
         displayString("Ardu");
     }
 
-    while (!metro.check()) { 
+    timer.restart();
+
+    while (timer.isActive()) { 
         displayString(" ino");
     }
 
-    metro.interval(100);
+    timer.setTimeout(100);
 }
 
 
@@ -102,7 +105,7 @@ void loop()
 
     displayString(str);
 
-    if (metro.check()) {
+    if (timer.onRestart()) {
         tick = (++tick % NTicks);
     }
 }

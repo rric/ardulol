@@ -16,21 +16,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Dieser Sketch verwendet die Metro-Bibliothek
-// https://github.com/thomasfredericks/Metro-Arduino-Wiring
-
-#include <Metro.h>
+// Dieser Sketch verwendet die RBD::Timer-Bibliothek
+#include <RBD_Timer.h>
 
 // Der Ausgangs-Pin der LED
 const int LEDPin = 11;
 
-// Ein Metro-Objekt, das alle 1000 Millisekunden tickt
-Metro ledMetro(1000);
-
+// Der Timer zum Schalten der LED
+RBD::Timer ledTimer;
 
 void setup()
 {
     pinMode(LEDPin, OUTPUT);
+
+    ledTimer.setTimeout(1000);
 }
 
 // Der momentane Status der LED
@@ -38,9 +37,10 @@ int state = LOW;
 
 void loop()
 {
-    // Wechsle bei jedem Tick des LED-Metro zwischen LOW und HIGH
-    if (ledMetro.check()) {
-        if (state == LOW) {  // Zeile 40
+    // Wechsle mit jedem Restart zwischen LOW und HIGH
+    if (ledTimer.onRestart()) {
+
+        if (state == LOW) {  // Zeile 43
             state = HIGH;
         }
         else {
@@ -61,7 +61,7 @@ void loop()
       noch das Flackern der LED zu erkennen? Was passiert, wenn man das
       Zeitintervall noch kleiner macht?
 
-   3. Finde mindestens zwei weitere Möglichkeiten, wie man in Zeile 40 ff
+   3. Finde mindestens zwei weitere Möglichkeiten, wie man in Zeile 43 ff
       zwischen LOW und HIGH hin- und her wechseln kann.
       (Hinweis: http://stackoverflow.com/questions/13154073)
 

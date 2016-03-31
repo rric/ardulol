@@ -1,6 +1,6 @@
 /* Temperatur.ino
  *
- * Copyright 2013, 2014, 2015 Roland Richter
+ * Copyright 2013, 2014, 2015, 2016 Roland Richter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
  * for more info.
  */
 
-#include <Metro.h>
+#include <RBD_Timer.h>
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -44,11 +44,13 @@ DallasTemperature sensor(&oneWire);
 // Connect LCD shield to pin 8, if any.
 SoftwareSerial s7s(7, 8);
 
-Metro tick = Metro(6000);
+RBD::Timer tick;
 
 
 void setup(void)
 {
+    tick.setTimeout(6000);
+
     sensor.begin();
 
     Serial.begin(9600);
@@ -68,7 +70,7 @@ void setup(void)
 
 void loop(void)
 {
-    if (tick.check() == 1) {
+    if (tick.onRestart()) {
         // Measure temperature in Celsius every six seconds, ...
         double currentTime = ((float)millis()) / (60. * 1000.);
 
