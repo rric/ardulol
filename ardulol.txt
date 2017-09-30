@@ -1,4 +1,6 @@
 
+\pagestyle{empty}
+
 BlinkBlink
 ===========
 
@@ -51,6 +53,14 @@ Lichtfalle
 ===========
 
 ![](Lichtfalle/Lichtfalle_Steckplatine.png)
+
+\newpage
+
+
+NaheDran
+========
+
+![](NaheDran/NaheDran_Steckplatine.png)
 
 \newpage
 
