@@ -1,6 +1,6 @@
 /* Lichtfalle.ino
  *
- * Copyright 2015 Roland Richter
+ * Copyright 2015, 2017 Roland Richter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(BuzzPin, OUTPUT);
 
-    attachInterrupt(0, triggerAlarm, RISING);   // Zeile 38
+    attachInterrupt(digitalPinToInterrupt(BarrierPin), triggerAlarm, RISING);   // Zeile 38
                                                 // Interrupt 0 = Pin 2 auf UNO
 }
 
